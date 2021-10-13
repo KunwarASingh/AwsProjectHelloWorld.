@@ -67,7 +67,7 @@ Mappings:
     eu-west-2:
      "AMI": "ami-0e9ef0822841b8bb1"
 
-#Defining Resources 
+# creating Resources 
 Resources:
   VPC:
     Type: AWS::EC2::VPC
@@ -142,3 +142,32 @@ PrivateSubnet1:
       Tags:
         - Key: Name
           Value: !Sub ${EnvironmentName} Private Subnet (AZ2)
+
+    NatGateway1EIP:
+    Type: AWS::EC2::EIP
+    #  Ip address for this resource depends on creation of IGW attachment in line 89 
+    DependsOn: InternetGatewayAttachment
+    Properties:
+    #allocating an address for use with in a VPC domain
+      Domain: vpc
+
+  NatGateway2EIP:
+    Type: AWS::EC2::EIP
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      Domain: vpc   
+
+# creating Public NAT 1 & 2 
+      NatGateway1:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatGateway1EIP.AllocationId
+      # line below refering to ID of the subnet in which the NAT gateway is located from line 96 .
+      SubnetId: !Ref PublicSubnet1
+
+  NatGateway2:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatGateway2EIP.AllocationId
+      SubnetId: !Ref PublicSubnet2
+      
