@@ -92,4 +92,28 @@ InternetGateway:
       InternetGatewayId: !Ref InternetGateway
       VpcId: !Ref VPC
 
-    
+#creating resource type public subnet 1, choosing Az 0, first AZ from the list of array of Az's
+    PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: !Ref PublicSubnet1CIDR
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Public Subnet (AZ1)
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 1, !GetAZs  '' ]
+      # taking cidr info from Parameters line 27
+      CidrBlock: !Ref PublicSubnet2CIDR
+      # line below stating resources created in public subnet 2 to recieve a public IPv4 address
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Public Subnet (AZ2)
+
