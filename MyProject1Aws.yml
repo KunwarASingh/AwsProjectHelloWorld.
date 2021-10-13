@@ -117,3 +117,28 @@ InternetGateway:
         - Key: Name
           Value: !Sub ${EnvironmentName} Public Subnet (AZ2)
 
+# Creating resource type private Subnet in 2 Az's 
+PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs  '' ]
+      #taking cidr info from Parameters line 32
+      CidrBlock: !Ref PrivateSubnet1CIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Private Subnet (AZ1)
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 1, !GetAZs  '' ]
+      CidrBlock: !Ref PrivateSubnet2CIDR
+      # line below stating resources created in Private subnet NOT to recieve a public IPv4 address rather a private IPv4 address from the 
+      # range of CIDR 10.192.21.0/24 line 37
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Private Subnet (AZ2)
