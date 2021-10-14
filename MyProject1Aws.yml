@@ -79,21 +79,21 @@ Resources:
         - Key: Name
           Value: !Ref EnvironmentName
 
-InternetGateway:
+  InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
         - Key: Name
           Value: !Ref EnvironmentName
 
-InternetGatewayAttachment:
+  InternetGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
       InternetGatewayId: !Ref InternetGateway
       VpcId: !Ref VPC
 
 #creating resource type public subnet 1, choosing Az 0, first AZ from the list of array of Az's
-PublicSubnet1:
+  PublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
@@ -104,7 +104,7 @@ PublicSubnet1:
         - Key: Name
           Value: !Sub ${EnvironmentName} Public Subnet (AZ1)
 
-PublicSubnet2:
+  PublicSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
@@ -118,7 +118,7 @@ PublicSubnet2:
           Value: !Sub ${EnvironmentName} Public Subnet (AZ2)
 
 # Creating resource type private Subnet in 2 Az's 
-PrivateSubnet1:
+  PrivateSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
@@ -130,7 +130,7 @@ PrivateSubnet1:
         - Key: Name
           Value: !Sub ${EnvironmentName} Private Subnet (AZ1)
 
-PrivateSubnet2:
+  PrivateSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
@@ -143,7 +143,7 @@ PrivateSubnet2:
         - Key: Name
           Value: !Sub ${EnvironmentName} Private Subnet (AZ2)
 
-NatGateway1EIP:
+  NatGateway1EIP:
     Type: AWS::EC2::EIP
     #  Ip address for this resource depends on creation of IGWattachment in line 89 
     DependsOn: InternetGatewayAttachment
@@ -151,28 +151,28 @@ NatGateway1EIP:
     #allocating an address for use with in a VPC domain
       Domain: vpc
 
-NatGateway2EIP:
+  NatGateway2EIP:
     Type: AWS::EC2::EIP
     DependsOn: InternetGatewayAttachment
     Properties:
       Domain: vpc   
 
 # creating NAT 1 & 2 in Public subnets
-NatGateway1:
+  NatGateway1:
     Type: AWS::EC2::NatGateway
     Properties:
       AllocationId: !GetAtt NatGateway1EIP.AllocationId
       # line below refering to ID of the subnet in which the NATgateway is located from line 96 .
       SubnetId: !Ref PublicSubnet1
 
-NatGateway2:
+  NatGateway2:
     Type: AWS::EC2::NatGateway
     Properties:
       AllocationId: !GetAtt NatGateway2EIP.AllocationId
       SubnetId: !Ref PublicSubnet2
 
 #creating PublicRoute table resource in our VPC
-PublicRouteTable:
+  PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref VPC
@@ -181,7 +181,7 @@ PublicRouteTable:
           Value: !Sub ${EnvironmentName} Public Routes
 
 # specifying a route in our PublicRouteTable
-DefaultPublicRoute:
+  DefaultPublicRoute:
     Type: AWS::EC2::Route
     DependsOn: InternetGatewayAttachment
     Properties:
@@ -192,21 +192,21 @@ DefaultPublicRoute:
       GatewayId: !Ref InternetGateway
 
 #Associating Public Subnets with a routetable
-PublicSubnet1RouteTableAssociation:
+  PublicSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref PublicRouteTable
       #assigning PublicSubnet1 to PublicRouteTable resource created in line 175
       SubnetId: !Ref PublicSubnet1
 
-PublicSubnet2RouteTableAssociation:
+  PublicSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref PublicSubnet2
 
 #creating Private Route table resource in our VPC
-PrivateRouteTable1:
+  PrivateRouteTable1:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref VPC
@@ -214,7 +214,7 @@ PrivateRouteTable1:
         - Key: Name
           Value: !Sub ${EnvironmentName} Private Routes (AZ1)
 
-DefaultPrivateRoute1:
+  DefaultPrivateRoute1:
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PrivateRouteTable1
@@ -223,13 +223,13 @@ DefaultPrivateRoute1:
       NatGatewayId: !Ref NatGateway1
 
 #assigning PrivateSubnet1 to PrivateRouteTable1 resource created in line 209
-PrivateSubnet1RouteTableAssociation:
+  PrivateSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref PrivateRouteTable1
       SubnetId: !Ref PrivateSubnet1
 
-PrivateRouteTable2:
+  PrivateRouteTable2:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref VPC
@@ -237,28 +237,28 @@ PrivateRouteTable2:
         - Key: Name
           Value: !Sub ${EnvironmentName} Private Routes (AZ2)
 
-DefaultPrivateRoute2:
+  DefaultPrivateRoute2:
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PrivateRouteTable2
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref NatGateway2
 
-PrivateSubnet2RouteTableAssociation:
+  PrivateSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref PrivateRouteTable2
       SubnetId: !Ref PrivateSubnet2
 
 
-NoIngressSecurityGroup:
+  NoIngressSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: "no-ingress-sg"
       GroupDescription: "Security group with no ingress rule"
       VpcId: !Ref VPC
 
-ELBSecurityGroup:
+  ELBSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: Enable HTTP from 0.0.0.0/0
@@ -269,7 +269,7 @@ ELBSecurityGroup:
           CidrIp: 0.0.0.0/0
       VpcId: !Ref VPC
 
-WebServerSecurityGroup:
+  WebServerSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: Enable SSH access and HTTP from 0.0.0.0/0
@@ -289,7 +289,7 @@ WebServerSecurityGroup:
       VpcId: !Ref VPC
 
 
-WebServerGroup:
+  WebServerGroup:
    Type: 'AWS::AutoScaling::AutoScalingGroup'
    Properties:
      AvailabilityZones:
@@ -315,7 +315,7 @@ WebServerGroup:
          PropagateAtLaunch: false
          Value: ASG
 
-MyLaunchTemplate:
+  MyLaunchTemplate:
    Type: AWS::EC2::LaunchTemplate
    Properties:
      LaunchTemplateData:
@@ -333,7 +333,7 @@ MyLaunchTemplate:
           systemctl enable httpd
           echo "Hello World" > /var/www/html/index.html
           
-WebServerTargetPolicy:
+  WebServerTargetPolicy:
    Type: AWS::AutoScaling::ScalingPolicy
    Properties:
      AutoScalingGroupName: !Ref WebServerGroup
@@ -343,7 +343,7 @@ WebServerTargetPolicy:
          PredefinedMetricType: ASGAverageCPUUtilization
        TargetValue: 50.0
 
-ApplicationLoadBalancer:
+  ApplicationLoadBalancer:
     Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
     Properties:
       SecurityGroups:
@@ -353,7 +353,7 @@ ApplicationLoadBalancer:
        - !Ref PublicSubnet2
        - !Ref PublicSubnet3
 
-ALBListener:
+  ALBListener:
     Type: 'AWS::ElasticLoadBalancingV2::Listener'
     Properties:
       DefaultActions:
@@ -363,7 +363,7 @@ ALBListener:
       Port: '80'
       Protocol: HTTP
 
-ALBTargetGroup:
+  ALBTargetGroup:
     Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
     Properties:
       HealthCheckIntervalSeconds: 30
@@ -395,7 +395,7 @@ Outputs:
   PublicSubnet2:
     Description: A reference to the public subnet in the 2nd Availability Zone
     Value: !Ref PublicSubnet2
-    
+
   PrivateSubnet1:
     Description: A reference to the private subnet in the 1st Availability Zone
     Value: !Ref PrivateSubnet1
