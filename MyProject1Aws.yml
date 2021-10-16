@@ -64,8 +64,8 @@ Parameters:
 
 Mappings:
   RegionMap:
-    eu-west-2:
-     "AMI": "ami-0e9ef0822841b8bb1"
+    us-east-1:
+     "AMI": "ami-0742b4e673072066f"
 
 # creating Resources 
 Resources:
@@ -295,7 +295,6 @@ Resources:
      AvailabilityZones:
        - !Select [ 0, !GetAZs '' ]
        - !Select [ 1, !GetAZs '' ]
-       - !Select [ 2, !GetAZs '' ]
      VPCZoneIdentifier:
        - !Ref PublicSubnet1
        - !Ref PublicSubnet2
